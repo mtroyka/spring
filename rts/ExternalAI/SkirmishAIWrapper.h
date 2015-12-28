@@ -49,6 +49,10 @@ public:
 	virtual void UnitMoveFailed(int unitId);
 	virtual void UnitGiven(int unitId, int oldTeam, int newTeam);
 	virtual void UnitCaptured(int unitId, int oldTeam, int newTeam);
+	virtual void AllyCreated(int unitId, int builderId);
+	virtual void AllyFinished(int unitId);
+	virtual void AllyDestroyed(int unitId, int attackerUnitId);
+	virtual void AllyDamaged(int unitId, int attackerUnitId, float damage, const float3& dir, int weaponDefId, bool paralyzer);
 	virtual void EnemyCreated(int unitId);
 	virtual void EnemyFinished(int unitId);
 	virtual void EnemyEnterLOS(int unitId);

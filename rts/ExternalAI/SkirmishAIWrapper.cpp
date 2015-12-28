@@ -336,6 +336,31 @@ void CSkirmishAIWrapper::UnitCaptured(int unitId, int oldTeam, int newTeam) {
 	ai->HandleEvent(EVENT_UNIT_CAPTURED, &evtData);
 }
 
+void CSkirmishAIWrapper::AllyCreated(int unitId, int builderId) {
+	SAllyCreatedEvent evtData = {unitId, builderId};
+	ai->HandleEvent(EVENT_ALLY_CREATED, &evtData);
+}
+
+void CSkirmishAIWrapper::AllyFinished(int unitId) {
+	SAllyFinishedEvent evtData = {unitId};
+	ai->HandleEvent(EVENT_ALLY_FINISHED, &evtData);
+}
+
+void CSkirmishAIWrapper::AllyDestroyed(int unitId, int attackerUnitId) {
+
+	SAllyDestroyedEvent evtData = {unitId, attackerUnitId};
+	ai->HandleEvent(EVENT_ALLY_DESTROYED, &evtData);
+}
+
+void CSkirmishAIWrapper::AllyDamaged(int unitId, int attackerUnitId,
+		float damage, const float3& dir, int weaponDefId, bool paralyzer) {
+
+	SAllyDamagedEvent evtData = {unitId, attackerUnitId, damage,
+			new float[3], weaponDefId, paralyzer};
+	dir.copyInto(evtData.dir_posF3);
+	ai->HandleEvent(EVENT_ALLY_DAMAGED, &evtData);
+	delete [] evtData.dir_posF3;
+}
 
 void CSkirmishAIWrapper::EnemyCreated(int unitId) {
 	SEnemyCreatedEvent evtData = {unitId};

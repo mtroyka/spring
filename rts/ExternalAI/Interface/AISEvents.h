@@ -56,8 +56,12 @@ enum EventTopic {
 	EVENT_ENEMY_CREATED                = 25,
 	EVENT_ENEMY_FINISHED               = 26,
 	EVENT_LUA_MESSAGE                  = 27,
+	EVENT_ALLY_CREATED                 = 28,
+	EVENT_ALLY_FINISHED                = 29,
+	EVENT_ALLY_DESTROYED               = 30,
+	EVENT_ALLY_DAMAGED                 = 31,
 };
-const int NUM_EVENTS = 28;
+const int NUM_EVENTS = 31;
 
 
 
@@ -174,10 +178,10 @@ struct SUnitIdleEvent {
 
 /**
  * This AI event is sent when a unit received a move command and is not able to
- * fullfill it. Reasons for this are:
+ * fulfill it. Reasons for this are:
  * - The unit is not able to move
  * - The path to the target location is blocked
- * - The unit can not move on the terain of the target location (for example,
+ * - The unit can not move on the terrain of the target location (for example,
  *   the target is on land, and the unit is a ship)
  */
 struct SUnitMoveFailedEvent {
@@ -186,8 +190,8 @@ struct SUnitMoveFailedEvent {
 
 /**
  * This AI event is sent when a unit was damaged. It contains the attacked unit,
- * the attacking unit, the ammount of damage and the direction from where the
- * damage was inflickted. In case of a laser weapon, the direction will point
+ * the attacking unit, the amount of damage and the direction from where the
+ * damage was inflicted. In case of a laser weapon, the direction will point
  * directly from the attacker to the attacked unit, while with artillery it will
  * rather be from somewhere up in the sky to the attacked unit.
  * See also the unit-destroyed event.
@@ -195,7 +199,7 @@ struct SUnitMoveFailedEvent {
 struct SUnitDamagedEvent {
 	int unit;
 	/**
-	 * may be -1, which means no attacker was directly involveld,
+	 * may be -1, which means no attacker was directly involved,
 	 * or the attacker is not visible and cheat events are off
 	 */
 	int attacker;
@@ -213,7 +217,7 @@ struct SUnitDamagedEvent {
 struct SUnitDestroyedEvent {
 	int unit;
 	/**
-	 * may be -1, which means no attacker was directly involveld,
+	 * may be -1, which means no attacker was directly involved,
 	 * or the attacker is not visible and cheat events are off
 	 */
 	int attacker;
@@ -241,6 +245,62 @@ struct SUnitCapturedEvent {
 	int oldTeamId;
 	int newTeamId;
 }; //$ EVENT_UNIT_CAPTURED INTERFACES:Unit(unitId),UnitLifeState(),UnitTeamChange(oldTeamId,newTeamId)
+
+/**
+ * This AI event is sent whenever a unit of an allied team is created, and contains
+ * the created unit. Usually, the unit has only 1 HP at this time, and consists
+ * only of a nano frame (-> will not accept commands yet).
+ * See also the ally-finished event.
+ */
+struct SAllyCreatedEvent {
+	int unit;
+	int builder;
+}; //$ EVENT_ALLY_CREATED INTERFACES:Unit(unit),UnitLifeState()
+
+/**
+ * This AI event is sent whenever an allied unit is fully built, and contains the
+ * finished unit. Usually, the unit has full health at this time, and is ready
+ * to accept commands.
+ * See also the unit-created event.
+ */
+struct SAllyFinishedEvent {
+	int unit;
+}; //$ EVENT_ALLY_FINISHED INTERFACES:Unit(unit),UnitLifeState()
+
+/**
+ * This AI event is sent when an allied unit was destroyed; see also the unit-damaged
+ * event.
+ */
+struct SAllyDestroyedEvent {
+	int unit;
+	/**
+	 * may be -1, which means no attacker was directly involved,
+	 * or the attacker is not visible and cheat events are off
+	 */
+	int attacker;
+}; //$ EVENT_ALLY_DESTROYED INTERFACES:Unit(unit),UnitLifeState()
+
+/**
+ * This AI event is sent when an allied unit was damaged. It contains the attacked unit,
+ * the attacking unit, the amount of damage and the direction from where the
+ * damage was inflicted. In case of a laser weapon, the direction will point
+ * directly from the attacker to the attacked unit, while with artillery it will
+ * rather be from somewhere up in the sky to the attacked unit.
+ * See also the unit-destroyed event.
+ */
+struct SAllyDamagedEvent {
+	int unit;
+	/**
+	 * may be -1, which means no attacker was directly involved,
+	 * or the attacker is not visible and cheat events are off
+	 */
+	int attacker;
+	float damage;
+	float* dir_posF3;
+	int weaponDefId;
+	/// if true, then damage is paralyzation damage, otherwise it is real damage
+	bool paralyzer;
+}; //$ EVENT_ALLY_DAMAGED INTERFACES:Unit(unit)
 
 /**
  * This AI event is sent when an enemy unit entered the LOS of this team.
